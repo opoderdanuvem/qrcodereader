@@ -173,7 +173,7 @@
             readerDiv.style.display = 'block';
 
             html5QrCode = new Html5QrCode("reader");
-            const config = { fps: 10, qrbox: { width: 100, height: 100 } };
+            const config = { fps: 10, qrbox: { width: 120, height: 120 } };
             
             Html5Qrcode.getCameras().then(cameras => {
                 if (cameras && cameras.length) {
