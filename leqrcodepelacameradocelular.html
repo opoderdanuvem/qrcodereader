@@ -40,7 +40,6 @@
             background-color: #005ecb;
         }
         
-        /* AJUSTE 1: #reader agora é o container do posicionamento */
         #reader {
             position: relative; /* Essencial para o posicionamento do overlay */
             width: 100%;
@@ -110,16 +109,13 @@
         const readerDiv = document.getElementById('reader');
         const resultDiv = document.getElementById('result');
         
-        // AJUSTE 2: Usaremos a classe Html5Qrcode, não a Html5QrcodeScanner
         let html5QrCode; 
 
         function showQrHighlight(points) {
-            // Esta função está correta e agora vai funcionar com o CSS ajustado
             const video = readerDiv.querySelector('video');
             if (!video) return;
 
             const videoRect = video.getBoundingClientRect();
-            const readerRect = readerDiv.getBoundingClientRect();
             const scaleX = videoRect.width / video.videoWidth;
             const scaleY = videoRect.height / video.videoHeight;
             
@@ -160,21 +156,18 @@
 
         function onScanFailure(error) { /* Nenhuma mudança aqui */ }
 
-        // AJUSTE 2: Lógica de clique totalmente refeita
         startButton.addEventListener('click', () => {
             startButton.style.display = 'none';
             resultDiv.innerHTML = '<p>Aponte a câmera para o QR Code...</p>';
             readerDiv.style.display = 'block';
 
-            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode = new Html5QrCode("reader");
             const config = { fps: 10, qrbox: { width: 200, height: 200 } };
             
-            // É ESTA FUNÇÃO QUE PEDE A PERMISSÃO IMEDIATAMENTE
             Html5Qrcode.getCameras().then(cameras => {
                 if (cameras && cameras.length) {
-                    // Tenta encontrar a câmera traseira ('environment')
                     let cameraId = cameras.find(camera => camera.label.toLowerCase().includes('back') || camera.label.toLowerCase().includes('traseira'))?.id;
-                    // Se não encontrar, usa a primeira câmera da lista
+                    
                     if (!cameraId) {
                         cameraId = cameras[0].id;
                     }
