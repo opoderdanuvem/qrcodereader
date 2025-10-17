@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor QR Code em Arquivo Único</title>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        /* Estilização básica */
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        /* Estilização para o container do scanner */
+        #reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border: 2px solid #ccc; /* Opcional: para visualizar a área do scanner */
+            border-radius: 8px;
+            overflow: hidden; /* Garante que o vídeo fique dentro do contêiner */
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+        #result h2 {
+            color: #28a745;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Leitor de QR Code Direto da Câmera</h1>
+
+    <div id="reader"></div>
+
+    <div id="result">
+        <p>Aponte a câmera para um código QR.</p>
+    </div>
+
+    <script>
+        // Função chamada quando um QR Code é lido com sucesso
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Código Decodificado: ${decodedText}`, decodedResult);
+            
+            // Exibe o resultado na página
+            document.getElementById('result').innerHTML = `
+                <h2>QR Code Lido com Sucesso!</h2>
+                <p><b>Dados:</b> ${decodedText}</p>
+                <p><b>Tipo:</b> ${decodedResult.result.format.formatName}</p>
+            `;
+
+            // **IMPORTANTE:** Para parar a leitura após o primeiro sucesso
+            // e liberar a câmera:
+            html5QrcodeScanner.clear();
+        }
+
+        // Função chamada em caso de erro (pode ser ignorada para a maioria dos casos)
+        function onScanError(errorMessage) {
+            // console.warn(`Erro de digitalização: ${errorMessage}`);
+        }
+
+        // 1. Inicializa o Scanner
+        // O ID 'reader' deve corresponder ao ID do elemento DIV
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", 
+            { 
+                fps: 10,             // Frames por segundo
+                qrbox: { width: 250, height: 250 }, // Tamanho da caixa de escaneamento
+                disableFlip: false,  // Permite girar a imagem se o código estiver invertido
+                // **Configuração crucial para usar a câmera traseira em dispositivos móveis:**
+                videoConstraints: {
+                    facingMode: { exact: "environment" } 
+                }
+            },
+            /* verbose= */ false
+        );
+
+        // 2. Inicia o Scanner
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    </script>
+
+</body>
+</html>
