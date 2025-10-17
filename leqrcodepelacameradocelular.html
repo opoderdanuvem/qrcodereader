@@ -86,14 +86,14 @@
             bottom: 10px;
             right: 10px;
             font-size: 0.8rem;
-            color: #920202; /* Mantendo sua cor personalizada */
+            color: #920202;
         }
     </style>
 </head>
 <body>
 
     <div id="versao">
-        <div>1.0.2</div>
+        <div>1.0.3</div>
     </div>
 
     <div class="container">
@@ -115,9 +115,9 @@
     </div>
 
     <script>
-        // *** INÍCIO DA CORREÇÃO ***
-        // Executa o código apenas quando o DOM estiver completamente carregado
-        document.addEventListener('DOMContentLoaded', () => {
+        // *** CORREÇÃO: Trocado 'DOMContentLoaded' por 'load' ***
+        // 'load' espera todos os recursos, incluindo scripts externos, serem carregados.
+        window.addEventListener('load', () => {
 
             const startButton = document.getElementById('startButton');
             const readerDiv = document.getElementById('reader');
@@ -175,7 +175,6 @@
                 resultDiv.innerHTML = '<p>Aponte a câmera para o QR Code...</p>';
                 readerDiv.style.display = 'block';
 
-                // AGORA a classe Html5Qrcode com certeza existe!
                 html5QrCode = new Html5QrCode("reader");
                 const config = { fps: 10, qrbox: { width: 100, height: 100 } };
                 
@@ -210,7 +209,7 @@
                 });
             });
 
-        }); // *** FIM DA CORREÇÃO ***
+        });
     </script>
 
 </body>
