@@ -3,204 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor QR Code com Destaque Visual</title>
+    <title>Leitor QR Code em Arquivo Único</title>
     
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
+        /* Seu CSS continua o mesmo */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: sans-serif;
             text-align: center;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #f0f0f0;
         }
         h1 {
-            color: #1d1d1f;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-        }
-        #startButton {
-            font-size: 1.2rem;
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            background-color: #007aff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #startButton:hover {
-            background-color: #005ecb;
+            color: #333;
         }
         #reader {
-            position: relative;
             width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
             border-radius: 8px;
             overflow: hidden;
-            border: 2px solid #e0e0e0;
-            display: none; /* Começa escondido */
-        }
-        /* O scanner vai criar um vídeo e outros elementos; garantimos que eles se ajustem */
-        #reader video {
-            width: 100% !important;
-            height: auto !important;
         }
         #result {
             margin-top: 20px;
             padding: 15px;
             background-color: white;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 5px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
             text-align: left;
-            word-wrap: break-word;
         }
-        #result h2 { color: #34c759; margin-top: 0; }
-        #result a { color: #007aff; text-decoration: none; }
-        #result a:hover { text-decoration: underline; }
-
-        #qr-highlight-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .qr-corner-marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 4px solid #34c759;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        #corner-1 { border-right: none; border-bottom: none; }
-        #corner-2 { border-left: none; border-bottom: none; }
-        #corner-3 { border-right: none; border-top: none; }
-        #corner-4 { border-left: none; border-top: none; }
-
-        #versao {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.8rem;
-            color: #920202;
+        #result h2 {
+            color: #28a745;
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
 
-    <div id="versao">
-        <div>1.0.7</div>
-    </div>
+    <h1>Leitor de QR Code Direto da Câmera</h1>
 
-    <div class="container">
-        <h1>Leitor de QR Code</h1>
-        <button id="startButton">Iniciar Leitor</button>
-        
-        <div id="reader">
-             <div id="qr-highlight-overlay">
-                <div class="qr-corner-marker" id="corner-1"></div>
-                <div class="qr-corner-marker" id="corner-2"></div>
-                <div class="qr-corner-marker" id="corner-3"></div>
-                <div class="qr-corner-marker" id="corner-4"></div>
-            </div>
-        </div>
-        
-        <div id="result">
-            <p>Clique em "Iniciar Leitor" para ligar a câmera.</p>
-        </div>
+    <div id="reader"></div>
+
+    <div id="result">
+        <p>Aponte a câmera para um código QR.</p>
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-
-            const startButton = document.getElementById('startButton');
-            const readerDiv = document.getElementById('reader');
-            const resultDiv = document.getElementById('result');
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Código Decodificado: ${decodedText}`, decodedResult);
             
-            let html5QrcodeScanner; // Usaremos o Scanner novamente
+            document.getElementById('result').innerHTML = `
+                <h2>QR Code Lido com Sucesso!</h2>
+                <p><b>Dados:</b> ${decodedText}</p>
+            `;
 
-            // O resto do código permanece o mesmo
-            function showQrHighlight(points) {
-                // A lógica de highlight continua válida
-                const video = readerDiv.querySelector('video');
-                if (!video) return;
-                const videoRect = video.getBoundingClientRect();
-                const containerRect = readerDiv.getBoundingClientRect(); // Posição do container
-                const scaleX = video.offsetWidth / video.videoWidth;
-                const scaleY = video.offsetHeight / video.videoHeight;
-                
-                const markers = document.querySelectorAll('.qr-corner-marker');
-                if (!points || points.length !== 4) return;
-                
-                markers[0].style.left = `${points[0].x * scaleX}px`;
-                markers[0].style.top = `${points[0].y * scaleY}px`;
-                markers[1].style.left = `${(points[1].x * scaleX) - 20}px`;
-                markers[1].style.top = `${points[1].y * scaleY}px`;
-                markers[2].style.left = `${(points[2].x * scaleX) - 20}px`;
-                markers[2].style.top = `${(points[2].y * scaleY) - 20}px`;
-                markers[3].style.left = `${points[3].x * scaleX}px`;
-                markers[3].style.top = `${(points[3].y * scaleY) - 20}px`;
-
-                markers.forEach(marker => marker.style.opacity = '1');
-                setTimeout(() => {
-                    markers.forEach(marker => marker.style.opacity = '0');
-                }, 800);
-            }
-
-            function onScanSuccess(decodedText, decodedResult) {
-                showQrHighlight(decodedResult.result.result.points);
-                
-                if (html5QrcodeScanner) {
-                    html5QrcodeScanner.clear().catch(err => {
-                        console.error("Falha ao limpar o scanner.", err);
-                    });
-                }
-                
-                startButton.style.display = 'block';
-                readerDiv.style.display = 'none';
-
-                let resultHtml;
-                if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
-                    resultHtml = `<h2>QR Code Lido!</h2><p><b>Link:</b> <a href="${decodedText}" target="_blank">${decodedText}</a></p>`;
-                } else {
-                    resultHtml = `<h2>QR Code Lido!</h2><p><b>Conteúdo:</b> ${decodedText}</p>`;
-                }
-                resultDiv.innerHTML = resultHtml;
-            }
-
-            function onScanFailure(error) { /* Ignorado */ }
-
-            // *** CORREÇÃO FUNDAMENTAL ***
-            startButton.addEventListener('click', () => {
-                startButton.style.display = 'none';
-                resultDiv.innerHTML = '<p>Aponte a câmera para o QR Code...</p>';
-                readerDiv.style.display = 'block';
-
-                // Criamos e renderizamos o SCANNER aqui dentro
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "reader", 
-                    { 
-                        fps: 10, 
-                        qrbox: { width: 150, height: 150 },
-                        videoConstraints: {
-                            facingMode: "environment"
-                        }
-                    },
-                    false // verbose
-                );
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            // Para a câmera após a leitura bem-sucedida.
+            // Nota: a variável precisa estar acessível aqui.
+            html5QrcodeScanner.clear().catch(error => {
+                console.error("Falha ao limpar o scanner.", error);
             });
-        });
+        }
+
+        function onScanFailure(error) {
+            // console.warn(`Código QR não encontrado: ${error}`);
+        }
+
+        // Inicializa o Scanner com a configuração mais flexível
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", 
+            { 
+                fps: 10,
+                qrbox: { width: 150, height: 150 }, // Aumentei um pouco para facilitar
+                // MUDANÇA IMPORTANTE ABAIXO:
+                videoConstraints: {
+                    facingMode: "environment" // Pede a câmera traseira, sem ser uma exigência estrita.
+                }
+            },
+            /* verbose= */ false
+        );
+
+        // Inicia o Scanner
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
 
 </body>
