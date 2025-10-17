@@ -93,7 +93,7 @@
 <body>
 
     <div id="versao">
-        <div>1.0.4</div>
+        <div>1.0.5</div>
     </div>
 
     <div class="container">
@@ -121,8 +121,8 @@
             const readerDiv = document.getElementById('reader');
             const resultDiv = document.getElementById('result');
             
-            // Instancia o leitor UMA VEZ. Ele será iniciado e parado conforme necessário.
-            const html5QrCode = new Html5QrCode("reader");
+            // Declaramos a variável aqui para que ela seja acessível em todas as funções
+            let html5QrCode; 
 
             function showQrHighlight(points) {
                 const video = readerDiv.querySelector('video');
@@ -151,15 +151,17 @@
             function onScanSuccess(decodedText, decodedResult) {
                 showQrHighlight(decodedResult.result.result.points);
                 
-                html5QrCode.stop().then(() => {
-                    startButton.style.display = 'block';
-                    readerDiv.style.display = 'none';
-                }).catch(err => {
-                    console.error("Falha ao parar o scanner.", err);
-                    // Mesmo com erro ao parar, mostramos o resultado
-                    startButton.style.display = 'block';
-                    readerDiv.style.display = 'none';
-                });
+                // Verifica se html5QrCode existe antes de chamar .stop()
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => {
+                        startButton.style.display = 'block';
+                        readerDiv.style.display = 'none';
+                    }).catch(err => {
+                        console.error("Falha ao parar o scanner.", err);
+                        startButton.style.display = 'block';
+                        readerDiv.style.display = 'none';
+                    });
+                }
 
                 let resultHtml;
                 if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
@@ -177,16 +179,17 @@
                 resultDiv.innerHTML = '<p>Aponte a câmera para o QR Code...</p>';
                 readerDiv.style.display = 'block';
 
+                // *** CORREÇÃO: A criação do objeto AGORA ESTÁ AQUI DENTRO ***
+                // Isso garante que ele só é criado quando necessário e depois da página carregar.
+                html5QrCode = new Html5QrCode("reader");
+
                 const config = { 
                     fps: 10, 
                     qrbox: { width: 100, height: 100 }
                 };
                 
-                // *** INÍCIO DA CORREÇÃO PRINCIPAL ***
-                // Este método é mais direto. Ele pede para iniciar usando a câmera traseira ('environment')
-                // e a própria biblioteca cuida de encontrar a câmera e pedir a permissão.
                 html5QrCode.start(
-                    { facingMode: "environment" }, // Pede a câmera traseira
+                    { facingMode: "environment" },
                     config,
                     onScanSuccess,
                     onScanFailure
@@ -196,7 +199,6 @@
                     startButton.style.display = 'block';
                     readerDiv.style.display = 'none';
                 });
-                // *** FIM DA CORREÇÃO PRINCIPAL ***
             });
         });
     </script>
