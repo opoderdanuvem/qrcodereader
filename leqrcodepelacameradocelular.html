@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
-        /* Estilização básica */
+        /* Seu CSS continua o mesmo */
         body {
             font-family: sans-serif;
             text-align: center;
@@ -19,14 +19,13 @@
         h1 {
             color: #333;
         }
-        /* Estilização para o container do scanner */
         #reader {
             width: 100%;
             max-width: 500px;
             margin: 20px auto;
-            border: 2px solid #ccc; /* Opcional: para visualizar a área do scanner */
+            border: 2px solid #ccc;
             border-radius: 8px;
-            overflow: hidden; /* Garante que o vídeo fique dentro do contêiner */
+            overflow: hidden;
         }
         #result {
             margin-top: 20px;
@@ -56,45 +55,41 @@
     </div>
 
     <script>
-        // Função chamada quando um QR Code é lido com sucesso
         function onScanSuccess(decodedText, decodedResult) {
             console.log(`Código Decodificado: ${decodedText}`, decodedResult);
             
-            // Exibe o resultado na página
             document.getElementById('result').innerHTML = `
                 <h2>QR Code Lido com Sucesso!</h2>
                 <p><b>Dados:</b> ${decodedText}</p>
-                <p><b>Tipo:</b> ${decodedResult.result.format.formatName}</p>
             `;
 
-            // **IMPORTANTE:** Para parar a leitura após o primeiro sucesso
-            // e liberar a câmera:
-            html5QrcodeScanner.clear();
+            // Para a câmera após a leitura bem-sucedida.
+            // Nota: a variável precisa estar acessível aqui.
+            html5QrcodeScanner.clear().catch(error => {
+                console.error("Falha ao limpar o scanner.", error);
+            });
         }
 
-        // Função chamada em caso de erro (pode ser ignorada para a maioria dos casos)
-        function onScanError(errorMessage) {
-            // console.warn(`Erro de digitalização: ${errorMessage}`);
+        function onScanFailure(error) {
+            // console.warn(`Código QR não encontrado: ${error}`);
         }
 
-        // 1. Inicializa o Scanner
-        // O ID 'reader' deve corresponder ao ID do elemento DIV
+        // Inicializa o Scanner com a configuração mais flexível
         const html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
             { 
-                fps: 10,             // Frames por segundo
-                qrbox: { width: 150, height: 150 }, // Tamanho da caixa de escaneamento
-                disableFlip: false,  // Permite girar a imagem se o código estiver invertido
-                // **Configuração crucial para usar a câmera traseira em dispositivos móveis:**
+                fps: 10,
+                qrbox: { width: 250, height: 250 }, // Aumentei um pouco para facilitar
+                // MUDANÇA IMPORTANTE ABAIXO:
                 videoConstraints: {
-                    facingMode: { exact: "environment" } 
+                    facingMode: "environment" // Pede a câmera traseira, sem ser uma exigência estrita.
                 }
             },
             /* verbose= */ false
         );
 
-        // 2. Inicia o Scanner
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
+        // Inicia o Scanner
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
 
 </body>
