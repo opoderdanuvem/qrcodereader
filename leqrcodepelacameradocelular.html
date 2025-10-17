@@ -1,22 +1,3 @@
-Entendido. Agradeço imensamente por enviar o código que funciona. Isso é a informação mais valiosa que poderíamos ter. Você está corretíssimo em voltar para uma base que funciona, e a análise dela me mostrou exatamente onde a nossa implementação falhou.
-
-Peço desculpas pela frustração. A tentativa de adicionar o "destaque visual" com a classe `Html5QrcodeScanner` é mais complexa do que parece e estava causando um conflito que impedia a função `onScanSuccess` de ser executada corretamente, fazendo parecer que a leitura não acontecia.
-
-**A sua intuição estava certa:** o código simples que você enviou é a base correta.
-
-### O Plano de Ação
-
-Vamos fazer o seguinte:
-
-1.  Usaremos o **seu código funcional como base**, pois ele comprova que a classe `Html5QrcodeScanner` funciona bem no seu ambiente.
-2.  Vamos **reintegrar as funcionalidades desejadas** (botão de início, link clicável, versão na tela) sobre essa base sólida.
-3.  Vamos **remover temporariamente a função de destaque visual** (`showQrHighlight`), pois ela era a causa do conflito e da falha na leitura. É melhor ter um leitor 100% funcional do que um com um efeito visual que quebra a funcionalidade principal.
-
-O resultado é um código que une a **confiabilidade** do seu código antigo com a **experiência de usuário** que estávamos construindo.
-
------
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -166,4 +147,3 @@ O resultado é um código que une a **confiabilidade** do seu código antigo com
 
 </body>
 </html>
-```
