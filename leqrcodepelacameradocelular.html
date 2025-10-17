@@ -47,6 +47,15 @@
             border: 2px solid #e0e0e0;
             display: none;
         }
+        
+        /* --- CORREÇÃO PRINCIPAL --- */
+        /* Garante que o elemento de vídeo, criado pela biblioteca, preencha a div #reader */
+        #reader video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Evita que a imagem da câmera fique distorcida */
+        }
+
         #result {
             margin-top: 20px;
             padding: 15px;
@@ -93,7 +102,7 @@
 <body>
 
     <div id="versao">
-        <div>1.0.5</div>
+        <div>1.0.6</div>
     </div>
 
     <div class="container">
@@ -121,7 +130,6 @@
             const readerDiv = document.getElementById('reader');
             const resultDiv = document.getElementById('result');
             
-            // Declaramos a variável aqui para que ela seja acessível em todas as funções
             let html5QrCode; 
 
             function showQrHighlight(points) {
@@ -151,8 +159,7 @@
             function onScanSuccess(decodedText, decodedResult) {
                 showQrHighlight(decodedResult.result.result.points);
                 
-                // Verifica se html5QrCode existe antes de chamar .stop()
-                if (html5QrCode) {
+                if (html5QrCode && html5QrCode.isScanning) {
                     html5QrCode.stop().then(() => {
                         startButton.style.display = 'block';
                         readerDiv.style.display = 'none';
@@ -179,8 +186,6 @@
                 resultDiv.innerHTML = '<p>Aponte a câmera para o QR Code...</p>';
                 readerDiv.style.display = 'block';
 
-                // *** CORREÇÃO: A criação do objeto AGORA ESTÁ AQUI DENTRO ***
-                // Isso garante que ele só é criado quando necessário e depois da página carregar.
                 html5QrCode = new Html5QrCode("reader");
 
                 const config = { 
