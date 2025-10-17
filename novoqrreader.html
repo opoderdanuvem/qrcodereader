@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leitor QR Code Otimizado (ZXing)</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest/umd/zxing.min.js"></script>
 
     <style>
         body {
@@ -76,7 +76,7 @@
 <body>
 
     <div id="versao">
-        <div>1.1.1</div>
+        <div>1.1.2</div>
     </div>
 
     <div class="container">
@@ -93,16 +93,14 @@
     </div>
 
     <script>
-        // *** INÍCIO DA CORREÇÃO DEFINITIVA ***
-
-        // 1. Todo o nosso código vai para dentro desta função de inicialização.
+        // A nossa lógica de verificação continua sendo a mais segura, 
+        // então vamos mantê-la.
         function initializeApp() {
             const startButton = document.getElementById('startButton');
             const readerDiv = document.getElementById('reader');
             const resultDiv = document.getElementById('result');
-            const videoElement = document.getElementById('video-preview');
-
-            // Agora, 'ZXing' com certeza existe.
+            
+            // Agora o objeto 'ZXing' será encontrado corretamente.
             const codeReader = new ZXing.BrowserQRCodeReader();
             
             function onScanSuccess(decodedText) {
@@ -141,21 +139,15 @@
             });
         }
 
-        // 2. Esta função verifica se a biblioteca ZXing está pronta.
         function checkLibraryAndInit() {
             if (typeof ZXing !== 'undefined') {
-                // A biblioteca está pronta! Chame a função principal.
                 initializeApp();
             } else {
-                // Ainda não está pronta, verifique novamente em 50ms.
                 setTimeout(checkLibraryAndInit, 50);
             }
         }
 
-        // 3. Inicia o processo de verificação.
         checkLibraryAndInit();
-
-        // *** FIM DA CORREÇÃO DEFINITIVA ***
     </script>
 
 </body>
